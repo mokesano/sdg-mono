@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * SDG Classification Presentation Interface
  * Interface modern untuk menampilkan hasil analisis SDG
@@ -1059,24 +1061,36 @@ $SDG_DEFINITIONS = [
 
     function ajaxRenderSummary(summaryData) {
         const summary = summaryData.researcher_sdg_summary || {};
-        const profile  = summaryData.contributor_profile     || {};
+        const profile = summaryData.contributor_profile    || {};
         const sdgCount = Object.keys(summary).length;
-        const relevantCount = Object.values(profile).filter(p => p.dominant_type === 'Relevant Contributor').length;
-        const activeCount = Object.values(profile).filter(p => p.dominant_type === 'Active Contributor').length;
+        
+        // --- BACA LANGSUNG DARI API BACKEND ---
+        const globalStats = summaryData.global_contributor_stats || {};
+        const relevantCount = globalStats['Relevant Contributor'] || 0;
+        const activeCount   = globalStats['Active Contributor'] || 0;
+    
         let totalConf = 0, confCount = 0;
         Object.values(summary).forEach(s => { totalConf += s.average_confidence; confCount++; });
         const avgConf = confCount > 0 ? Math.round((totalConf / confCount) * 100) : 0;
+        
+        // Cetak angka ke DOM (Badge Paling Atas)
         const e = id => document.getElementById(id);
-        if (e('ajaxStatSdgs'))   e('ajaxStatSdgs').textContent   = sdgCount;
+        if (e('ajaxStatSdgs'))     e('ajaxStatSdgs').textContent     = sdgCount;
         if (e('ajaxStatRelevant')) e('ajaxStatRelevant').textContent = relevantCount;
-        if (e('ajaxStatActive')) e('ajaxStatActive').textContent = activeCount;
-        if (e('ajaxStatConf'))   e('ajaxStatConf').textContent   = avgConf + '%';
+        if (e('ajaxStatActive'))   e('ajaxStatActive').textContent   = activeCount;
+        if (e('ajaxStatConf'))     e('ajaxStatConf').textContent     = avgConf + '%';
+        
         if (!Object.keys(summary).length) return;
+        
         let html = '<h3 class="u-heading3"><i class="fas fa-chart-pie"></i> Summary of SDG Contributions</h3><div class="sdg-grid">';
         Object.entries(summary).forEach(([sdg, sum], i) => {
             const def = SDG_DEFS[sdg] || { title: sdg, color: '#666', svg_url: '' };
             const prf = profile[sdg] || {};
             const pct = (sum.average_confidence * 100).toFixed(1);
+            
+            // --- PERBAIKAN: Pengecekan aman untuk teks Badge di dalam card ---
+            const badgeType = prf.dominant_type || prf.type || '';
+            
             html += `<div class="sdg-card">
               <div class="sdg-icon"><img src="${escH(def.svg_url)}" alt="${escH(def.title||sdg)}"></div>
               <div class="sdg-content">
@@ -1086,31 +1100,41 @@ $SDG_DEFINITIONS = [
                   <div class="sdg-stat-item"><div class="sdg-stat-label">Confidence</div><div class="sdg-stat-value">${pct}%</div></div>
                 </div>
                 <div class="confidence-bar"><div class="confidence-fill" style="width:${pct}%;background:${def.color}"></div></div>
-                ${prf.dominant_type ? '<div class="contributor-type">'+escH(prf.dominant_type)+'</div>' : ''}
+                ${badgeType ? '<div class="contributor-type">'+escH(badgeType)+'</div>' : ''}
               </div>
               <style>.sdg-card:nth-of-type(${i+1})::after{background:${def.color}}</style>
             </div>`;
         });
         html += '</div>';
+        
         const el = document.getElementById('ajaxSdgSummary');
         if (el) el.innerHTML = html;
-
-        // Charts
+    
+        // --- CHARTS RENDER ---
         const chartsEl = document.getElementById('ajaxCharts');
         if (chartsEl) {
             chartsEl.innerHTML = `<div class="charts-section">
               <div class="chart-container"><h4><i class="fas fa-chart-pie"></i> SDG distribution</h4><canvas id="ajaxSdgChart"></canvas></div>
               <div class="chart-container"><h4><i class="fas fa-chart-bar"></i> Contributor Type</h4><canvas id="ajaxContribChart"></canvas></div>
             </div>`;
+            
             if (ajaxSdgChart) ajaxSdgChart.destroy();
             ajaxSdgChart = new Chart(document.getElementById('ajaxSdgChart'), {
                 type: 'doughnut',
                 data: { labels: Object.keys(summary).map(s=>(SDG_DEFS[s]||{}).title||s), datasets: [{ data: Object.values(summary).map(s=>s.work_count), backgroundColor: Object.keys(summary).map(s=>(SDG_DEFS[s]||{}).color||'#666'), borderWidth: 2, borderColor: '#fff' }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { padding: 10, usePointStyle: true, font: { size: 13 } } } } }
             });
+            
             if (ajaxContribChart) ajaxContribChart.destroy();
+            
+            // --- PERBAIKAN: Hitung Ctypes dengan string fallback yang aman ---
             const ctypes = {};
-            Object.values(profile).forEach(p => { ctypes[p.dominant_type] = (ctypes[p.dominant_type] || 0) + 1; });
+            Object.values(profile).forEach(p => { 
+                const typeName = p.dominant_type || p.type || 'Unclassified';
+                ctypes[typeName] = (ctypes[typeName] || 0) + 1; 
+            });
+            // ------------------------------------------------------------------
+            
             ajaxContribChart = new Chart(document.getElementById('ajaxContribChart'), {
                 type: 'bar',
                 data: { labels: Object.keys(ctypes), datasets: [{ label: 'Number of SDGs', data: Object.values(ctypes), backgroundColor: ['#667eea','#764ba2','#f093fb','#f5576c','#4facfe'], borderWidth: 0, borderRadius: 8 }] },
