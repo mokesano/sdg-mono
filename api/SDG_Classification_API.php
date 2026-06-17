@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * SDG Classification API
  * Sistem klasifikasi SDG dengan orientasi dampak yang lebih kuat
@@ -510,6 +512,14 @@ function handleOrcidSummaryRequest($orcid) {
     $researcher_sdg_summary = [];
     $total_analyzed         = 0;
 
+    // --- PERBAIKAN: Variabel agregasi global untuk badge UI ---
+    $global_contributor_stats = [
+        'Active Contributor' => 0,
+        'Relevant Contributor' => 0,
+        'Discutor' => 0,
+        'Not Relevant' => 0
+    ];
+
     // Baca semua batch cache dan agregasi
     for ($offset = 0; $offset < $total_works; $offset += $limit) {
         $batch_cache_id   = $orcid . '_' . $offset . '_' . $limit;
@@ -521,6 +531,10 @@ function handleOrcidSummaryRequest($orcid) {
 
         foreach ($batch_data['works'] as $work) {
             $total_analyzed++;
+            
+            // Lacak role tertinggi untuk mencegah double-counting dalam 1 karya
+            $work_highest_role = 'Not Relevant';
+            $role_weights = ['Not Relevant' => 0, 'Discutor' => 1, 'Relevant Contributor' => 2, 'Active Contributor' => 3];
 
             foreach ($work['detailed_analysis'] as $sdg => $analysis) {
                 if ($analysis['score'] < $CONFIG['CONFIDENCE_THRESHOLD']) continue;
@@ -561,6 +575,16 @@ function handleOrcidSummaryRequest($orcid) {
                     ];
                 }
                 unset($s);
+
+                // Tetapkan peran tertinggi untuk artikel ini
+                if (isset($role_weights[$ct]) && $role_weights[$ct] > $role_weights[$work_highest_role]) {
+                    $work_highest_role = $ct;
+                }
+            }
+
+            // --- PERBAIKAN: Tambahkan ke statistik global ---
+            if (isset($global_contributor_stats[$work_highest_role])) {
+                $global_contributor_stats[$work_highest_role]++;
             }
         }
     }
@@ -602,14 +626,15 @@ function handleOrcidSummaryRequest($orcid) {
     }
 
     return [
-        'status'               => 'success',
-        'action'               => 'summary',
-        'api_version'          => 'v1.0.0',
-        'personal_info'        => $init_data['personal_info'],
+        'status'                 => 'success',
+        'action'                 => 'summary',
+        'api_version'            => 'v1.0.0',
+        'personal_info'          => $init_data['personal_info'],
         'researcher_sdg_summary' => $researcher_sdg_summary,
-        'contributor_profile'  => $contributor_profile,
-        'total_works_analyzed' => $total_analyzed,
-        'timestamp'            => date('c'),
+        'contributor_profile'    => $contributor_profile,
+        'global_contributor_stats'=> $global_contributor_stats, // <--- PAYLOAD BARU
+        'total_works_analyzed'   => $total_analyzed,
+        'timestamp'              => date('c'),
     ];
 }
 
