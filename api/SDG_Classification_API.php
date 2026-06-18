@@ -1766,7 +1766,20 @@ function extractOrcidInstitutionsEnhanced($person_data, $employment_data) {
 function saveToCache($filename, $data) {
     global $CACHE_DIR;
     if (!is_dir($CACHE_DIR)) mkdir($CACHE_DIR, 0755, true);
-    file_put_contents($filename, gzencode(json_encode($data), 9));
+
+    // Gunakan flag JSON_INVALID_UTF8_SUBSTITUTE untuk otomatis 
+    // membersihkan karakter aneh dari abstrak API eksternal
+    $json_string = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+
+    // Fallback pengaman lapis kedua jika json_encode masih gagal (misal karena ada nilai NAN/INF)
+    if ($json_string === false) {
+        $json_string = json_encode([
+            'status' => 'error', 
+            'message' => 'Cache encoding failed: ' . json_last_error_msg()
+        ]);
+    }
+
+    file_put_contents($filename, gzencode($json_string, 9));
 }
 
 function readFromCache($filename) {
@@ -1812,8 +1825,25 @@ function getCacheFilename($type, $id) {
 // =================================================================
 try {
     $result = main();
-    echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    
+    // Tambahkan flag JSON_INVALID_UTF8_SUBSTITUTE di output final
+    $json_output = json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+    
+    // Jika masih gagal encode karena alasan lain yang ekstrem
+    if ($json_output === false) {
+        throw new Exception('Final JSON encoding failed: ' . json_last_error_msg());
+    }
+    
+    echo $json_output;
+    
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['status' => 'error', 'code' => 500, 'message' => 'Internal error: ' . $e->getMessage(), 'timestamp' => date('c'), 'api_version' => 'v1.0.0'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    // Pastikan error response juga dilindungi flag substitute
+    echo json_encode([
+        'status'      => 'error', 
+        'code'        => 500, 
+        'message'     => 'Internal error: ' . $e->getMessage(), 
+        'timestamp'   => date('c'), 
+        'api_version' => 'v1.0.0'
+    ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
 }
