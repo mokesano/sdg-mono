@@ -1061,19 +1061,53 @@ $SDG_DEFINITIONS = [
 
     function ajaxRenderSummary(summaryData) {
         const summary = summaryData.researcher_sdg_summary || {};
-        const profile = summaryData.contributor_profile    || {};
         const sdgCount = Object.keys(summary).length;
         
-        // --- BACA LANGSUNG DARI API BACKEND ---
-        const globalStats = summaryData.global_contributor_stats || {};
-        const relevantCount = globalStats['Relevant Contributor'] || 0;
-        const activeCount   = globalStats['Active Contributor'] || 0;
-    
+        // 1. VARIABEL PENYIMPANAN SINKRONISASI
+        let activeCount = 0;
+        let relevantCount = 0;
+        const chartCtypes = {
+            'Active Contributor': 0,
+            'Relevant Contributor': 0,
+            'Discutor': 0,
+            'Not Relevant': 0
+        };
+        const sdgFinalStatus = {}; // Menyimpan status final per SDG agar tidak dihitung dua kali
+
+        // 2. PENENTUAN STATUS MUTLAK PER SDG (Berdasarkan Artikel, bukan API Profile)
+        Object.entries(summary).forEach(([sdg, sum]) => {
+            const cTypes = sum.contributor_types || {};
+            let status = 'Not Relevant'; // Kunci default di Not Relevant
+            
+            // Evaluasi hierarki murni dari karya yang ada di SDG ini
+            if (cTypes['Active Contributor'] > 0) {
+                status = 'Active Contributor';
+            } else if (cTypes['Relevant Contributor'] > 0) {
+                status = 'Relevant Contributor';
+            } else if (cTypes['Discutor'] > 0) {
+                status = 'Discutor';
+            }
+            // Jika cTypes hanya berisi 'Not Relevant', loop if di atas akan terlewati 
+            // dan status TETAP AMAN di 'Not Relevant'
+            
+            sdgFinalStatus[sdg] = status; // Simpan untuk dirender ke Card nanti
+            
+            // Tambahkan ke counter untuk Top Badge
+            if (status === 'Active Contributor') activeCount++;
+            if (status === 'Relevant Contributor') relevantCount++;
+            
+            // Tambahkan ke counter Grafik Batang
+            if (chartCtypes[status] !== undefined) {
+                chartCtypes[status]++;
+            }
+        });
+
+        // 3. KALKULASI RATA-RATA CONFIDENCE
         let totalConf = 0, confCount = 0;
         Object.values(summary).forEach(s => { totalConf += s.average_confidence; confCount++; });
         const avgConf = confCount > 0 ? Math.round((totalConf / confCount) * 100) : 0;
         
-        // Cetak angka ke DOM (Badge Paling Atas)
+        // 4. RENDER LENCANA ATAS (Top Badges)
         const e = id => document.getElementById(id);
         if (e('ajaxStatSdgs'))     e('ajaxStatSdgs').textContent     = sdgCount;
         if (e('ajaxStatRelevant')) e('ajaxStatRelevant').textContent = relevantCount;
@@ -1081,29 +1115,15 @@ $SDG_DEFINITIONS = [
         if (e('ajaxStatConf'))     e('ajaxStatConf').textContent     = avgConf + '%';
         
         if (!Object.keys(summary).length) return;
-        
+
+        // 5. RENDER SDG CARDS
         let html = '<h3 class="u-heading3"><i class="fas fa-chart-pie"></i> Summary of SDG Contributions</h3><div class="sdg-grid">';
         Object.entries(summary).forEach(([sdg, sum], i) => {
             const def = SDG_DEFS[sdg] || { title: sdg, color: '#666', svg_url: '' };
-            // prf tidak lagi menjadi patokan utama, kita baca langsung dari 'sum'
-            const prf = profile[sdg] || {};
             const pct = (sum.average_confidence * 100).toFixed(1);
             
-            // --- PERBAIKAN: Cari Peran Tertinggi (Highest Role) di SDG ini ---
-            let badgeType = 'Not Relevant';
-            const cTypes = sum.contributor_types || {};
-            
-            if (cTypes['Active Contributor'] > 0) {
-                badgeType = 'Active Contributor';
-            } else if (cTypes['Relevant Contributor'] > 0) {
-                badgeType = 'Relevant Contributor';
-            } else if (cTypes['Discutor'] > 0) {
-                badgeType = 'Discutor';
-            } else if (prf.dominant_type) {
-                // Fallback jika API lama digunakan
-                badgeType = prf.dominant_type; 
-            }
-            // ------------------------------------------------------------------
+            // Panggil status yang sudah dihitung mutlak di atas (TIDAK LAGI MEMBACA prf.dominant_type)
+            const badgeType = sdgFinalStatus[sdg];
             
             html += `<div class="sdg-card">
               <div class="sdg-icon"><img src="${escH(def.svg_url)}" alt="${escH(def.title||sdg)}"></div>
@@ -1124,7 +1144,7 @@ $SDG_DEFINITIONS = [
         const el = document.getElementById('ajaxSdgSummary');
         if (el) el.innerHTML = html;
     
-        // --- CHARTS RENDER ---
+        // 6. RENDER GRAFIK (CHARTS)
         const chartsEl = document.getElementById('ajaxCharts');
         if (chartsEl) {
             chartsEl.innerHTML = `<div class="charts-section">
@@ -1141,26 +1161,15 @@ $SDG_DEFINITIONS = [
             
             if (ajaxContribChart) ajaxContribChart.destroy();
             
-            // --- PERBAIKAN GRAFIK: Gunakan data global langsung dari API (Sinkron dengan Badge) ---
-            const globalChartStats = summaryData.global_contributor_stats || {};
-            
-            // Susun urutan kategori agar tampil rapi di grafik
-            const ctypes = {
-                'Active Contributor': globalChartStats['Active Contributor'] || 0,
-                'Relevant Contributor': globalChartStats['Relevant Contributor'] || 0,
-                'Discutor': globalChartStats['Discutor'] || 0
-            };
-            // -----------------------------------------------------------------
-            
-            if (ajaxContribChart) ajaxContribChart.destroy();
             ajaxContribChart = new Chart(document.getElementById('ajaxContribChart'), {
                 type: 'bar',
                 data: { 
-                    labels: Object.keys(ctypes), 
+                    labels: Object.keys(chartCtypes), 
                     datasets: [{ 
-                        label: 'Number of Works', // Ubah label dari 'Number of SDGs' menjadi 'Number of Works'
-                        data: Object.values(ctypes), 
-                        backgroundColor: ['#28a745', '#17a2b8', '#ffc107', '#6c757d'], // Sesuaikan warna jika perlu
+                        label: 'Number of SDGs', 
+                        // Ambil data langsung dari perhitungan tersinkronisasi
+                        data: Object.values(chartCtypes), 
+                        backgroundColor: ['#28a745', '#17a2b8', '#ffc107', '#6c757d'], 
                         borderWidth: 0, 
                         borderRadius: 8 
                     }] 
