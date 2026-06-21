@@ -1127,17 +1127,31 @@ $SDG_DEFINITIONS = [
             
             if (ajaxContribChart) ajaxContribChart.destroy();
             
-            // --- PERBAIKAN: Hitung Ctypes dengan string fallback yang aman ---
-            const ctypes = {};
-            Object.values(profile).forEach(p => { 
-                const typeName = p.dominant_type || p.type || 'Unclassified';
-                ctypes[typeName] = (ctypes[typeName] || 0) + 1; 
-            });
-            // ------------------------------------------------------------------
+            // --- PERBAIKAN GRAFIK: Gunakan data global langsung dari API (Sinkron dengan Badge) ---
+            const globalChartStats = summaryData.global_contributor_stats || {};
             
+            // Susun urutan kategori agar tampil rapi di grafik
+            const ctypes = {
+                'Active Contributor': globalChartStats['Active Contributor'] || 0,
+                'Relevant Contributor': globalChartStats['Relevant Contributor'] || 0,
+                'Discutor': globalChartStats['Discutor'] || 0,
+                'Not Relevant': globalChartStats['Not Relevant'] || 0
+            };
+            // -----------------------------------------------------------------
+            
+            if (ajaxContribChart) ajaxContribChart.destroy();
             ajaxContribChart = new Chart(document.getElementById('ajaxContribChart'), {
                 type: 'bar',
-                data: { labels: Object.keys(ctypes), datasets: [{ label: 'Number of SDGs', data: Object.values(ctypes), backgroundColor: ['#667eea','#764ba2','#f093fb','#f5576c','#4facfe'], borderWidth: 0, borderRadius: 8 }] },
+                data: { 
+                    labels: Object.keys(ctypes), 
+                    datasets: [{ 
+                        label: 'Number of Works', // Ubah label dari 'Number of SDGs' menjadi 'Number of Works'
+                        data: Object.values(ctypes), 
+                        backgroundColor: ['#28a745', '#17a2b8', '#ffc107', '#6c757d'], // Sesuaikan warna jika perlu
+                        borderWidth: 0, 
+                        borderRadius: 8 
+                    }] 
+                },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { stepSize: 1, font: { size: 10 } } }, x: { ticks: { maxRotation: 45, font: { size: 13 } } } } }
             });
         }
