@@ -1085,11 +1085,25 @@ $SDG_DEFINITIONS = [
         let html = '<h3 class="u-heading3"><i class="fas fa-chart-pie"></i> Summary of SDG Contributions</h3><div class="sdg-grid">';
         Object.entries(summary).forEach(([sdg, sum], i) => {
             const def = SDG_DEFS[sdg] || { title: sdg, color: '#666', svg_url: '' };
+            // prf tidak lagi menjadi patokan utama, kita baca langsung dari 'sum'
             const prf = profile[sdg] || {};
             const pct = (sum.average_confidence * 100).toFixed(1);
             
-            // --- PERBAIKAN: Pengecekan aman untuk teks Badge di dalam card ---
-            const badgeType = prf.dominant_type || prf.type || '';
+            // --- PERBAIKAN: Cari Peran Tertinggi (Highest Role) di SDG ini ---
+            let badgeType = 'Not Relevant';
+            const cTypes = sum.contributor_types || {};
+            
+            if (cTypes['Active Contributor'] > 0) {
+                badgeType = 'Active Contributor';
+            } else if (cTypes['Relevant Contributor'] > 0) {
+                badgeType = 'Relevant Contributor';
+            } else if (cTypes['Discutor'] > 0) {
+                badgeType = 'Discutor';
+            } else if (prf.dominant_type) {
+                // Fallback jika API lama digunakan
+                badgeType = prf.dominant_type; 
+            }
+            // ------------------------------------------------------------------
             
             html += `<div class="sdg-card">
               <div class="sdg-icon"><img src="${escH(def.svg_url)}" alt="${escH(def.title||sdg)}"></div>
@@ -1100,7 +1114,7 @@ $SDG_DEFINITIONS = [
                   <div class="sdg-stat-item"><div class="sdg-stat-label">Confidence</div><div class="sdg-stat-value">${pct}%</div></div>
                 </div>
                 <div class="confidence-bar"><div class="confidence-fill" style="width:${pct}%;background:${def.color}"></div></div>
-                ${badgeType ? '<div class="contributor-type">'+escH(badgeType)+'</div>' : ''}
+                ${badgeType ? '<div class="contributor-type" data-role="'+escH(badgeType)+'">'+escH(badgeType)+'</div>' : ''}
               </div>
               <style>.sdg-card:nth-of-type(${i+1})::after{background:${def.color}}</style>
             </div>`;
@@ -1134,8 +1148,7 @@ $SDG_DEFINITIONS = [
             const ctypes = {
                 'Active Contributor': globalChartStats['Active Contributor'] || 0,
                 'Relevant Contributor': globalChartStats['Relevant Contributor'] || 0,
-                'Discutor': globalChartStats['Discutor'] || 0,
-                'Not Relevant': globalChartStats['Not Relevant'] || 0
+                'Discutor': globalChartStats['Discutor'] || 0
             };
             // -----------------------------------------------------------------
             
