@@ -1,5 +1,9 @@
 <?php
+declare(strict_types=1);
+
 /**
+ * @file pages/home.php
+ * 
  * SDG Frontend - Home Page
  * Halaman utama untuk analisis SDG - versi yang berfungsi
  * 

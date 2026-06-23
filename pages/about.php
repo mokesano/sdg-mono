@@ -1,5 +1,15 @@
 <?php
-// pages/about.php - About page
+declare(strict_types=1);
+
+/**
+ * @file pages/about.php
+ * 
+ * Copyright (c) 2024 Wizdam AI Team
+ * Copyright (c) 2024 Rochmady and Sangia.org
+ * 
+ * SDG Frontend - About Page
+ * @brief Halaman "About" yang menjelaskan misi, cerita, teknologi, tim, dan nilai-nilai Wizdam AI.
+ */
 $page_title = "About Us";
 $page_description = "Learn about Wizdam AI's mission to advance Sustainable Development Goals through AI-powered research analysis and classification technology.";
 ?>

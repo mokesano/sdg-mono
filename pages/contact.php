@@ -1,5 +1,15 @@
 <?php
-// pages/contact.php - Contact page
+declare(strict_types=1);
+
+/**
+ * @file pages/contact.php
+ * 
+ * Copyright (c) 2024 Wizdam AI Team
+ * Copyright (c) 2024 Rochmady and Sangia.org
+ * 
+ * @brief Contact page for SDG Frontend - Contact Page - SDG Frontend
+ * This page provides a contact form for users to reach out to the Wizdam AI team.
+ */
 $page_title = "Contact Us";
 $page_description = "Get in touch with the Wizdam AI team. We're here to help with your SDG analysis needs, technical support, and partnership inquiries.";
 

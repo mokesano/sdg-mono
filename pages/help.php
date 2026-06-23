@@ -1,4 +1,14 @@
 <?php
+declare(strict_types=1);
+
+/**
+ * @file pages/help.php
+ * 
+ * Copyright (c) 2024 Wizdam Team
+ * Copyright (c) 2024 Rochmady and Sangia.org
+ * 
+ * @brief Help Center page for the SDG Classification Analysis platform.
+ */
 // pages/help.php - Help Center page
 $page_title = "Help Center";
 $page_description = "Find answers to common questions, troubleshooting guides, and step-by-step tutorials for the Wizdam AI SDG Classification platform.";
