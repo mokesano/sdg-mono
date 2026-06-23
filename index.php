@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * SDG Frontend - Main Application Router
  * Router utama yang menggabungkan semua komponen dengan benar
