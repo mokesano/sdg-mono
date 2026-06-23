@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Entry point – https://wizdam.sangia.org
  * Letak file: /home/user/public_html/wizdam/public/index.php
