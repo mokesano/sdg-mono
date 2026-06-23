@@ -2,59 +2,6 @@
 
 A comprehensive restructuring of the SDG Classification Analysis platform built with PHP, JavaScript, and modern web technologies. This project provides AI-powered analysis of research contributions to the United Nations Sustainable Development Goals (SDGs).
 
-## 🏗️ Project Structure
-
-```
-sdg/
-├── index.php                         # Main application file (router)
-├── README.md                         # Documentation
-│ 
-├── includes/                         # Core modules
-│   ├── config.php                    # Configuration settings
-│   ├── functions.php                 # All PHP functions
-│   └── sdg_definitions.php           # SDG definitions and data
-│
-├── assets/                           # Static assets
-│   ├── css/
-│   │   ├── style.css                 # Main stylesheet
-│   │   └── chatbot.css              # Chatbot stylesheet
-│   ├── js/
-│   │   ├── script.js                 # Main JavaScript
-│   │   └── chart.js                  # Chart JavaScript
-│   └── images/
-│       ├── image1.svg                # Image 1
-│       └── image2.svg                # Image 2 etc.
-│
-├── pages/                            # Page content
-│   ├── home.php                      # Main SDG analysis interface
-│   ├── about.php                     # About page
-│   ├── apps.php                      # Apps page
-│   ├── teams.php                     # Teams page
-│   ├── archived.php                  # Archive page
-│   ├── help.php                      # Help page
-│   ├── contact.php                   # Contact page
-│   ├── documentation.php             # Documentation page
-│   ├── analitics-dashboard.php       # Analytics Dashboard page
-│   ├── api-access.php                # API Access page
-│   ├── bulk-analysis.php             # Bulk Analysis page
-│   ├── integration-tools.php         # Integration Tools page
-│   ├── tutorials.php                 # Tutorials page
-│   ├── research-papers.php           # Research papers
-│   ├── api-reference.php             # API reference
-│   ├── community-forum.php           # Community forum
-│   ├── blog.php                      # Blog & updates
-│   ├── careers.php                   # Careers page
-│   ├── partners.php                  # Partners page
-│   ├── press-kit.php                 # Press kit
-│   └── privacy-policy.php            # Privacy policy
-│
-└── components/                       # Reusable components
-    ├── navigation.php                # Navigation component
-    ├── header.php                    # Header component
-    ├── chatbot.php                   # Chatbot component
-    └── footer.php                    # Footer component
-```
-
 ## 🛠️ Technology Stack
 
 ### External Services
@@ -165,45 +112,7 @@ $SDG_DEFINITIONS = [
 }
 ```
 
-## 🤝 Contributing
-
-### Development Setup
-1. **Fork the repository**
-2. **Create feature branch**: `git checkout -b feature/amazing-feature`
-3. **Make changes** following coding standards
-4. **Test thoroughly** across browsers and devices
-5. **Commit changes**: `git commit -m 'Add amazing feature'`
-6. **Push to branch**: `git push origin feature/amazing-feature`
-7. **Open Pull Request**
-
-### Coding Standards
-- **PHP**: Follow PSR-12 coding standards
-- **JavaScript**: Use ES6+ features, consistent naming
-- **CSS**: Use BEM methodology, mobile-first approach
-- **HTML**: Semantic markup, accessibility compliance
-
-### Testing Guidelines
-- **Cross-browser**: Test on major browsers
-- **Responsive**: Verify mobile, tablet, desktop layouts
-- **Accessibility**: Use screen readers, keyboard navigation
-- **Performance**: Monitor loading times and metrics
-
-## 👥 Team
-
-### Core Development Team
-- **Project Lead**: Rochmady
-- **AI Development**: Wizdam AI Team
-- **Frontend**: Wizdam AI Team
-- **Backend**: Wizdam AI Team
-- **Design**: Rochmady & Wizdam AI Team
-
 ### Special Thanks
 - **UN SDG Team**: For providing SDG framework and guidelines
 - **ORCID**: For researcher identification infrastructure
 - **Crossref**: For DOI resolution services
-
----
-
-**Built with ❤️ by the Wizdam AI Team**
-
-*Advancing Sustainable Development Goals through AI-powered research analysis*
