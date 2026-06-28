@@ -1,5 +1,9 @@
 <?php
+declare(strict_types=1);
+
 /**
+ * @file apis/JournalChecker.php
+ * 
  * Scopus Journal Metrics Checker - Enhanced Version
  * 
  * Fitur: CiteScore, Quartile, SJR, SNIP, Subject Areas, Discontinued Status
@@ -881,11 +885,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['issn'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scopus Journal Metrics Checker | Wizdam</title>
+    <title>Scopus Journal Metrics Checker | Lumera</title>
     <meta name="description" content="An API and visual platform to check Scopus-indexed journal metrics by ISSN. Provides real-time CiteScore, Quartile, SJR, and SNIP data for research and integration." />
     <meta name="owner" content="PT. Sangia Research Media and Publishing" />
-    <meta name="design" content="Rochmady and Wizdam AI Team" />
-    <meta name="generator" content="Wizdam AI v1.8.0" />
+    <meta name="design" content="Rochmady, CodeLumera and AI Team" />
+    <meta name="generator" content="Lumera AI v1.8.0" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -1029,7 +1033,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['issn'])) {
            MAIN CONTAINER
            ================================================================== */
         .container {
-            max-width: 1000px;
+            max-width: 1080px;
             margin: 70px auto;
             /*background: white;*/
             border-radius: var(--radius);
@@ -1865,14 +1869,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['issn'])) {
            ================================================================== */
         .chatbot {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
+            bottom: 40px;
+            right: 35px;
             z-index: 1000;
         }
         
         .chatbot-toggle {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
             border: none;
             border-radius: 50%;
@@ -1892,10 +1896,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['issn'])) {
         .chatbot-window {
             display: none;
             position: absolute;
-            bottom: 80px;
+            bottom: 60px;
             right: 0;
-            width: 350px;
-            height: 450px;
+            width: 400px;
+            height: 600px;
             background: white;
             border-radius: 15px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
@@ -1906,8 +1910,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['issn'])) {
         .chatbot-header {
             background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
             color: white;
-            padding: 20px;
+            padding: 10px 20px;
             font-weight: 600;
+            font-size: 1.27rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -1917,13 +1922,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['issn'])) {
             background: none;
             border: none;
             color: white;
-            font-size: 1.2em;
+            font-size: 1em;
             cursor: pointer;
             padding: 5px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .chatbot-close:hover { 
+            background: rgba(255,255,255,0.2); 
         }
         
         .chatbot-messages {
-            height: 320px;
+            height: 470px;
             padding: 20px;
             overflow-y: auto;
             background: #f8f9fa;
@@ -1989,13 +2002,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['issn'])) {
         .back-to-top {
             position: fixed;
             bottom: 110px;
-            right: 35px;
-            width: 50px;
-            height: 50px;
+            right: 40px;
+            width: 40px;
+            height: 40px;
             background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
             color: white;
             border: none;
-            border-radius: 50%;
+            border-radius: 7px;
             cursor: pointer;
             font-size: 1.2em;
             opacity: 0;
@@ -2289,7 +2302,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['issn'])) {
         <div class="navbar-container">
             <a href="#" class="navbar-brand">
                 <i class="fas fa-chart-line"></i>
-                WIZDAM AI-sikola
+                SANGIA Lumera
             </a>
             
             <ul class="navbar-nav">
@@ -2458,7 +2471,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['issn'])) {
                         <?php if ($result['citescore']): ?>
                         <div class="metric-card citescore">
                             <div class="metric-label">CiteScore</div>
-                            <div class="metric-value"><?php echo number_format($result['citescore'], 2); ?></div>
+                            <div class="metric-value"><?php echo number_format((float) $result['citescore'], 2); ?></div>
                             <div class="metric-description">
                                 Rata-rata sitasi per dokumen dalam 3 tahun terakhir
                                 <?php if ($result['citescore_year']): ?>
@@ -2477,7 +2490,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['issn'])) {
                             <div class="metric-description">
                                 <?php if ($result['percentile']): ?>
                                 <div class="percentile">
-                                        <strong>Percentile: <?php echo number_format($result['percentile'], 1); ?>%</strong>
+                                        <strong>Percentile: <?php echo number_format((float) $result['percentile'], 1); ?>%</strong>
                                 </div>
                                 <?php endif; ?>
                                 <div class="rank quartile_year">
@@ -2752,7 +2765,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['issn'])) {
                 <div class="footer-section brand-wide">
                     <div class="footer-brand">
                         <i class="fas fa-chart-line"></i>
-                        WIZDAM AI-sikola
+                        SANGIA Lumera
                     </div>
                     <div class="brand-description">
                         <p>Platform visualisasi hasil analisis metrik jurnal ilmiah yang memberikan informasi terkini dan akurat tentang CiteScore, Quartile, SJR, dan SNIP dari database Scopus.
@@ -2760,11 +2773,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['issn'])) {
                     </div>
                     <div class="footer-support">Developed by Rochmady & Wizdam Team. | Contact: rochmady at sangia.org | Data powered by Scopus API</div>
                     <div class="social-links">
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-facebook"></i></a>
-                        <a href="#"><i class="fab fa-linkedin"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="https://twitter.com/SangiaNews?lang=en" target="_blank"><i class="fab fa-twitter"></i></a>
+                        <a href="https://www.facebook.com/sangiapublishing" target="_blank"><i class="fab fa-facebook"></i></a>
+                        <a href="https://www.linkedin.com/company/68901582" target="_blank"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://www.tiktok.com/@rochmady" target="_blank"><i class="fab fa-tiktok"></i></a>
+                        <a href="https://www.youtube.com/channel/UCAx2FDkLH77Phh5zRSIVRfw" target="_blank"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
                 
@@ -2804,7 +2817,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['issn'])) {
             
             <div class="footer-bottom">
                 <div class="footer-copyright">
-                    <div class="copyright-title">© 2025 Wizdam by PT. Sangia Research Media and Publishing. All rights reserved.</div>
+                    <div class="copyright-title">© 2025 Lumera by PT. Sangia Research Media and Publishing. All rights reserved.</div>
                 </div>
                 <ul class="footer-bottom-links">
                     <li><a href="#">Terms of Service</a></li>
