@@ -166,7 +166,7 @@ $SDG_DEFINITIONS = [
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", 'Inter', system-ui, sans-serif; background: #f8f9fa; min-height: 100vh; color: #333; padding-top: 80px; }
         .navbar { position: fixed; top: 0; left: 0; right: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid rgba(0,0,0,0.1); z-index: 1000; transition: all 0.3s ease; min-height: 80px; }
         .navbar.scrolled { background: rgba(255,255,255,0.98); box-shadow: 0 2px 20px rgba(0,0,0,0.1); }
-        .navbar-container { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; }
+        .navbar-container { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; }
         .navbar-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: #333; font-weight: 700; font-size: 1.5rem; }
         .navbar-brand-logo { width: 40px; height: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; }
         .navbar-menu { display: flex; align-items: center; gap: 30px; list-style: none; }
@@ -325,7 +325,7 @@ $SDG_DEFINITIONS = [
         /* Footer & Chatbot */
         .footer { color: white; margin-top: 60px; position: relative; overflow: hidden; background-color: #34495e; background-image: url("//assets.sangia.org/img/SDGs_icon_SVG/border-sdga.svg"); background-position: top center; background-repeat: no-repeat; }
         .footer::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="footergrid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23footergrid)"/></svg>'); }
-        .footer-container { max-width: 1200px; margin: 0 auto; padding: 50px 20px 30px; position: relative; z-index: 2; }
+        .footer-container { max-width: 1280px; margin: 0 auto; padding: 50px 20px 30px; position: relative; z-index: 2; }
         .footer-main { display: grid; grid-template-columns: repeat(5, 1fr); gap: 40px; margin-bottom: 40px; }
         .footer-brand { grid-column: span 2; }
         .footer-section { grid-column: span 1; }

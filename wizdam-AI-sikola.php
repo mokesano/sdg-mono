@@ -608,7 +608,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .navbar-container {
-            max-width: 1200px;
+            max-width: 1280px;
             margin: 0 auto;
             display: flex;
             align-items: center;
@@ -1540,7 +1540,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .footer-container {
-            max-width: 1200px;
+            max-width: 1280px;
             margin: 0 auto;
             padding: 50px 20px 30px;
             position: relative;
